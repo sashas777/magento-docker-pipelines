@@ -1,2 +1,3 @@
 #!/bin/bash
+docker network create magento || true
 docker-compose run cli magento-installer
