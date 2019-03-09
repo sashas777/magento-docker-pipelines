@@ -1,0 +1,156 @@
+version: '3'
+
+services:
+  db:
+    image: 'mariadb:10.2'
+    ports:
+      - '3306:3306'
+    volumes:
+      - /var/lib/mysql
+      - ./dev/mysql/custom-config.cnf:/etc/mysql/conf.d/custom-config.cnf
+      - ./dev/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    hostname: db.magento2.docker
+    networks:
+     - magento
+    environment:
+      - MYSQL_ROOT_PASSWORD=magento2
+      - MYSQL_DATABASE=magento2
+      - MYSQL_USER=magento2
+      - MYSQL_PASSWORD=magento2
+  fpm:
+    image: 'sashas777/magento-php:7.2-fpm'
+    hostname: fpm.magento2.docker
+    ports:
+      - 9000
+    depends_on:
+      - db
+      - cron
+      - mailhog
+#    volumes_from:
+#      - appdata
+    env_file:
+      - ./global.env
+    restart: unless-stopped
+    networks:
+     - magento
+    volumes:
+      - ./src:/var/www/magento:rw
+#      - vendor:/var/www/magento/vendor
+#      - pub:/var/www/magento/pub
+#      - var:/var/www/magento/var
+#      - generated:/var/www/magento/generated
+#      - etc:/var/www/magento/etc
+  web:
+    image: 'sashas777/magento-nginx:latest'
+    ports:
+      - '443:443'
+    depends_on:
+      - fpm
+      - db
+ #   volumes_from:
+ #     - appdata
+    env_file:
+      - ./global.env
+    restart: unless-stopped
+    networks:
+     - magento
+    volumes:
+      - ./src:/var/www/magento:rw
+      - ./dev/ssl:/etc/nginx/ssl:ro
+#      - vendor:/var/www/magento/vendor
+#      - pub:/var/www/magento/pub
+#      - var:/var/www/magento/var
+#      - generated:/var/www/magento/generated
+#      - etc:/var/www/magento/etc
+  cli:
+    image: 'sashas777/magento-php:7.2-cli'
+    hostname: cli.magento2.docker
+    restart: unless-stopped
+    depends_on:
+      - db
+      - mailhog
+    volumes:
+      - /.dev/composer-cache:/root/.composer/cache:rw
+      - ./src:/var/www/magento:rw
+#      - vendor:/var/www/magento/vendor
+#      - pub:/var/www/magento/pub
+#      - var:/var/www/magento/var
+#      - generated:/var/www/magento/generated
+#      - etc:/var/www/magento/etc
+#
+#    volumes_from:
+#      - appdata
+    env_file:
+      - ./global.env
+    networks:
+     - magento
+    environment:
+      - M2_SETUP_VERSION=2.3.0
+      - DB_NAME=magento2
+      - DB_USER=magento2
+      - DB_PASSWORD=magento2
+      - BASE_URL=https://magento2.test/
+      - ADMIN_FIRSTNAME=admin
+      - ADMIN_LASTNAME=admin
+      - ADMIN_EMAIL=admin@magento2.test
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=admin2019
+      - TIMEZONE=America/New_York
+      - SECURE_BASE_URL=https://magento2.test/
+      - BACKEND_FRONTNAME=admin
+      - VERSION=community
+      - CURRENCY=USD
+      - LANGUAGE=en_US
+      - USE_SAMPLE_DATA=true
+  cron:
+    image: 'sashas777/magento-php:7.2-cli'
+    hostname: cron.magento2.docker
+    depends_on:
+      - db
+      - cli
+      - mailhog
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/magento:rw
+#      - vendor:/var/www/magento/vendor
+#      - pub:/var/www/magento/pub
+#      - var:/var/www/magento/var
+#      - generated:/var/www/magento/generated
+#      - etc:/var/www/magento/etc
+#    volumes_from:
+#      - appdata
+    env_file:
+      - ./global.env
+    command: run-cron
+    networks:
+     - magento
+  mailhog:
+    image: mailhog/mailhog
+    networks:
+     - magento
+    ports:
+      - '8025:8025'
+#  appdata:
+#    image: tianon/true
+#    volumes:
+#      - './src/mnt:/mnt'
+#      - /var/www/magento/vendor
+#      - /var/www/magento/generated
+#      - /var/www/magento/pub
+#      - /var/www/magento/var
+#      - /var/www/magento/app/etc
+#  data:
+#    image: tianon/true
+#    networks:
+#      - magento
+#    volumes:
+#      - vendor:/var/www/magento/vendor
+#      - pub:/var/www/magento/pub
+#      - var:/var/www/magento/var
+#      - generated:/var/www/magento/generated
+#      - etc:/var/www/magento/etc
+networks:
+  magento:
+   external:
+    name: magento

@@ -1,0 +1,9 @@
+[mysqld]
+auto_increment_increment=3
+table_open_cache=250
+max_allowed_packet=64M
+wait_timeout=1800
+connect_timeout=60
+tmp_table_size=16M
+max_heap_table_size=16M
+innodb_buffer_pool_size=2G
