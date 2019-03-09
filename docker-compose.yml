@@ -102,7 +102,7 @@ services:
       - VERSION=community
       - CURRENCY=USD
       - LANGUAGE=en_US
-      - USE_SAMPLE_DATA=true
+      - USE_SAMPLE_DATA=false
   cron:
     image: 'sashas777/magento-php:7.2-cli'
     hostname: cron.magento2.docker

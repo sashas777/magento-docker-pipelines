@@ -1,0 +1,24 @@
+services: docker
+
+env:
+  - DOCKER_COMPOSE_VERSION=1.24.0
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker -v
+  # Use the env config
+  - cp global.env.sample global.env
+  - mkdir src
+  - sed -i "s/<USERNAME>/$COMPOSER_MAGENTO_USERNAME/" global.env
+  - sed -i "s/<PASSWORD>/$COMPOSER_MAGENTO_PASSWORD/" global.env
+  # Stop the postgres instance travis sets up automatically
+  - sudo /etc/init.d/postgresql stop
+  - sudo service mysql stop
+install:
+  # Start the docker stuff
+  - docker-compose pull
+script:
+  - bin/install
+after_success:
