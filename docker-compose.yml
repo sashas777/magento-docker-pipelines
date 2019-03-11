@@ -55,6 +55,7 @@ services:
     volumes:
       - ./src:/var/www/magento:rw
       - ./dev/ssl:/etc/nginx/ssl:ro
+      - ./dev/nginx/mapping.conf:/etc/nginx/conf.d/a-mapping.conf:rw
 #      - vendor:/var/www/magento/vendor
 #      - pub:/var/www/magento/pub
 #      - var:/var/www/magento/var
