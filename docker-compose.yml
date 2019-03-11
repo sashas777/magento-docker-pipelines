@@ -13,11 +13,8 @@ services:
     hostname: db.magento2.docker
     networks:
      - magento
-    environment:
-      - MYSQL_ROOT_PASSWORD=magento2
-      - MYSQL_DATABASE=magento2
-      - MYSQL_USER=magento2
-      - MYSQL_PASSWORD=magento2
+    env_file:
+      - ./global.env
   fpm:
     image: 'sashas777/magento-php:7.2-fpm'
     hostname: fpm.magento2.docker
@@ -85,24 +82,6 @@ services:
       - ./global.env
     networks:
      - magento
-    environment:
-      - M2_SETUP_VERSION=2.3.0
-      - DB_NAME=magento2
-      - DB_USER=magento2
-      - DB_PASSWORD=magento2
-      - BASE_URL=https://magento2.test/
-      - ADMIN_FIRSTNAME=admin
-      - ADMIN_LASTNAME=admin
-      - ADMIN_EMAIL=admin@magento2.test
-      - ADMIN_USER=admin
-      - ADMIN_PASSWORD=admin2019
-      - TIMEZONE=America/New_York
-      - SECURE_BASE_URL=https://magento2.test/
-      - BACKEND_FRONTNAME=admin
-      - VERSION=community
-      - CURRENCY=USD
-      - LANGUAGE=en_US
-      - USE_SAMPLE_DATA=false
   cron:
     image: 'sashas777/magento-php:7.2-cli'
     hostname: cron.magento2.docker
