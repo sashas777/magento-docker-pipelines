@@ -1,0 +1,36 @@
+image: sashas777/magento-php:7.3-cli
+pipelines:
+    pull-requests:
+        '**':
+            - step:
+                  caches:
+                      - composer
+                  name: Build
+                  script:
+                      - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS                  
+                      - composer install --no-suggest --no-ansi --no-interaction --no-scripts
+                  artifacts:
+                      - vendor/**
+            - parallel:
+                  - step:
+                        caches:
+                            - composer
+                        name: PHP Code Sniffer
+                        script:
+                            - vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard/
+                            - vendor/bin/phpcs --ignore=*/vendor/*,*/Test/*  --standard=Magento2 .
+                  - step:
+                        caches:
+                            - composer
+                        name: PHP Mess Detector
+                        script:
+                            - vendor/bin/phpmd . ansi vendor/thesgroup/magento2-testing-framework/static/phpmd/ruleset.xml --exclude vendor/,Test/
+                  - step:
+                        caches:
+                            - composer
+                        name: Unit Tests
+                        script:
+                            - docker-php-ext-enable xdebug
+                            - vendor/bin/phpunit-tests
+                        artifacts:
+                            - test-coverage-html/**
