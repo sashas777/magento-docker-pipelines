@@ -34,3 +34,32 @@ pipelines:
                             - vendor/bin/phpunit-tests
                         artifacts:
                             - test-coverage-html/**
+          # Tests which require a database
+            -   step:
+                  caches:
+                    - composer
+                  services:
+                    - mysql
+                  name: Build | Install/Upgrade | DI
+                  script:
+                    - rm -rf vendor; rm -rf test-coverage-html;  cd /var/www/magento/;
+                    - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS
+                    - composer create-project --repository-url=https://repo.magento.com/  magento/project-community-edition=2.3.5 . --no-interaction --no-ansi --no-dev
+                    - composer config --global repositories.bitbucket.test path $BITBUCKET_CLONE_DIR
+                    - composer require (cat composer.json | jq -r '.name') --no-update
+                    - bin/magento setup:install --base-url='http://magento2.dev/' --admin-firstname='admin' --admin-lastname='admin' --admin-email='admin@magento2.dev' --admin-user='admin' --admin-password='asubdH5Ck6UP58NB' --db-host='127.0.0.1' --db-name='magento2' --db-user='magento2' --db-password='magento2' --cleanup-database --no-interaction --no-ansi
+                    - bin/magento setup:di:compile --no-interaction --no-ansi
+                  artifacts:
+                    - /var/www/magento/var/log/debug.log
+                    - /var/www/magento/var/log/exception.log
+                    - /var/www/magento/var/log/support_report.log
+                    - /var/www/magento/var/log/system.log
+definitions:
+  services:
+    mysql:
+      image: mariadb:10.2
+      environment:
+        MYSQL_DATABASE: 'magento2'
+        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        MYSQL_USER: 'magento2'
+        MYSQL_PASSWORD: 'magento2'
