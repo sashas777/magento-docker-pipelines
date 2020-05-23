@@ -17,14 +17,25 @@ pipelines:
                             - composer
                         name: PHP Code Sniffer
                         script:
-                            - vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard/
-                            - vendor/bin/phpcs --ignore=*/vendor/*,*/Test/*  --standard=Magento2 .
+                            - vendor/bin/phpcs-tests
+                  - step:
+                      caches:
+                        - composer
+                      name: ESLint
+                      script:
+                        - vendor/bin/js-tests
                   - step:
                         caches:
                             - composer
                         name: PHP Mess Detector
                         script:
-                            - vendor/bin/phpmd . ansi vendor/thesgroup/magento2-testing-framework/static/phpmd/ruleset.xml --exclude vendor/,Test/
+                            - vendor/bin/phpmd-tests
+                  - step:
+                      caches:
+                        - composer
+                      name: Magento Integrity Tests
+                      script:
+                        - vendor/bin/integrity-tests
                   - step:
                         caches:
                             - composer
