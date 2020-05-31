@@ -28,6 +28,15 @@ phpcs:
     script:
         - vendor/bin/phpcs-tests
 
+phpstan:
+    stage: test
+    cache:
+        key: $CI_COMMIT_SHA
+        paths:
+            - vendor/
+    script:
+        - vendor/bin/phpstan-tests
+
 eslint:
     stage: test
     cache:
