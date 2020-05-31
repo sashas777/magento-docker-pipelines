@@ -19,6 +19,12 @@ pipelines:
                         script:
                             - vendor/bin/phpcs-tests
                   - step:
+                        caches:
+                            - composer
+                        name: PHP Static Analysis
+                        script:
+                            - vendor/bin/phpstan-tests                            
+                  - step:
                       caches:
                         - composer
                       name: ESLint
