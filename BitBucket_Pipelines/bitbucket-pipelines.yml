@@ -1,4 +1,4 @@
-image: sashas777/magento-php:7.3-cli
+image: sashas777/magento-php:7.4-cli
 pipelines:
     pull-requests:
         '**':
@@ -7,7 +7,8 @@ pipelines:
                       - composer
                   name: Build
                   script:
-                      - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS                  
+                      - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS        
+                      - composer require --dev thesgroup/magento2-testing-framework --no-update
                       - composer install --no-suggest --no-ansi --no-interaction --no-scripts
                   artifacts:
                       - vendor/**
@@ -37,6 +38,12 @@ pipelines:
                         script:
                             - vendor/bin/phpmd-tests
                   - step:
+                        caches:
+                            - composer
+                        name: PHP Static Analysis
+                        script:
+                            - vendor/bin/phpstan-tests
+                  - step:
                       caches:
                         - composer
                       name: Magento Integrity Tests
@@ -57,11 +64,12 @@ pipelines:
                     - composer
                   services:
                     - mysql
+                    - elasticsearch
                   name: Build | Install/Upgrade | DI
                   script:
                     - rm -rf vendor; rm -rf test-coverage-html;  cd /var/www/magento/;
                     - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS
-                    - composer create-project --repository-url=https://repo.magento.com/  magento/project-community-edition=2.3.5 . --no-interaction --no-ansi --no-dev
+                    - composer create-project --repository-url=https://repo.magento.com/  magento/project-community-edition . --no-interaction --no-ansi --no-dev
                     - composer config --global repositories.bitbucket.test path $BITBUCKET_CLONE_DIR
                     - composer require $(cat $BITBUCKET_CLONE_DIR/composer.json | jq -r '.name') *@dev  --update-no-dev
                     - bin/magento setup:install --base-url='http://magento2.dev/' --admin-firstname='admin' --admin-lastname='admin' --admin-email='admin@magento2.dev' --admin-user='admin' --admin-password='asubdH5Ck6UP58NB' --db-host='127.0.0.1' --db-name='magento2' --db-user='magento2' --db-password='magento2' --cleanup-database --no-interaction --no-ansi
@@ -80,3 +88,11 @@ definitions:
         MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
         MYSQL_USER: 'magento2'
         MYSQL_PASSWORD: 'magento2'
+    elasticsearch:
+      image: sashas777/magento-elasticsearch:7.9.3
+      environment:
+        ES_NETWORK_HOST: 'localhost'
+        ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+      ports:
+        - "9200:9200"
+      memory: 2048   
