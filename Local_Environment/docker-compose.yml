@@ -1,136 +1,82 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
-    image: 'mariadb:10.2'
+    image: 'mariadb:10.4'
     ports:
       - '3306:3306'
     volumes:
-      - /var/lib/mysql
-      - ./dev/mysql/custom-config.cnf:/etc/mysql/conf.d/custom-config.cnf
       - ./dev/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ~/mysql:/var/lib/mysql
+      - ./dev/mysql/custom-config.cnf:/etc/mysql/conf.d/custom-config.cnf
     restart: unless-stopped
     hostname: db.magento2.docker
-    networks:
-     - magento
     env_file:
       - ./global.env
   fpm:
-    image: 'sashas777/magento-php:7.2-fpm'
+    image: 'sashas777/magento-php:7.4-fpm'
     hostname: fpm.magento2.docker
     ports:
       - 9000
     depends_on:
       - db
-      - cron
-      - mailhog
-#    volumes_from:
-#      - appdata
     env_file:
       - ./global.env
     restart: unless-stopped
-    networks:
-     - magento
     volumes:
       - ./src:/var/www/magento:rw
-#      - vendor:/var/www/magento/vendor
-#      - pub:/var/www/magento/pub
-#      - var:/var/www/magento/var
-#      - generated:/var/www/magento/generated
-#      - etc:/var/www/magento/etc
   web:
     image: 'sashas777/magento-nginx:latest'
-    ports:
-      - '443:443'
     depends_on:
       - fpm
       - db
- #   volumes_from:
- #     - appdata
     env_file:
       - ./global.env
     restart: unless-stopped
-    networks:
-     - magento
     volumes:
       - ./src:/var/www/magento:rw
-      - ./dev/ssl:/etc/nginx/ssl:ro
-      - ./dev/nginx/mapping.conf:/etc/nginx/conf.d/a-mapping.conf:rw
-#      - vendor:/var/www/magento/vendor
-#      - pub:/var/www/magento/pub
-#      - var:/var/www/magento/var
-#      - generated:/var/www/magento/generated
-#      - etc:/var/www/magento/etc
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.tls=true
+      - traefik.http.routers.web.rule=Host(`${WEBSITE_DOMAIN}`)
+      - traefik.http.services.web.loadbalancer.server.port=8080
   cli:
-    image: 'sashas777/magento-php:7.2-cli'
+    image: 'sashas777/magento-php:7.4-cli'
     hostname: cli.magento2.docker
     restart: unless-stopped
     depends_on:
       - db
-      - mailhog
+      - elasticsearch
     volumes:
-      - /.dev/composer-cache:/root/.composer/cache:rw
+      - ~/.cache/composer:/root/.cache/composer:rw
       - ./src:/var/www/magento:rw
-#      - vendor:/var/www/magento/vendor
-#      - pub:/var/www/magento/pub
-#      - var:/var/www/magento/var
-#      - generated:/var/www/magento/generated
-#      - etc:/var/www/magento/etc
-#
-#    volumes_from:
-#      - appdata
     env_file:
       - ./global.env
-    networks:
-     - magento
-  cron:
-    image: 'sashas777/magento-php:7.2-cli'
-    hostname: cron.magento2.docker
-    depends_on:
-      - db
-      - cli
-      - mailhog
+  elasticsearch:
+    image: 'sashas777/magento-elasticsearch:7.9.3'
+    hostname: elasticsearch.magento2.docker
     restart: unless-stopped
-    volumes:
-      - ./src:/var/www/magento:rw
-#      - vendor:/var/www/magento/vendor
-#      - pub:/var/www/magento/pub
-#      - var:/var/www/magento/var
-#      - generated:/var/www/magento/generated
-#      - etc:/var/www/magento/etc
-#    volumes_from:
-#      - appdata
-    env_file:
-      - ./global.env
-    command: run-cron
-    networks:
-     - magento
-  mailhog:
-    image: mailhog/mailhog
-    networks:
-     - magento
+    environment:
+      ES_NETWORK_HOST: 'localhost'
+      ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
     ports:
-      - '8025:8025'
-#  appdata:
-#    image: tianon/true
-#    volumes:
-#      - './src/mnt:/mnt'
-#      - /var/www/magento/vendor
-#      - /var/www/magento/generated
-#      - /var/www/magento/pub
-#      - /var/www/magento/var
-#      - /var/www/magento/app/etc
-#  data:
-#    image: tianon/true
-#    networks:
-#      - magento
-#    volumes:
-#      - vendor:/var/www/magento/vendor
-#      - pub:/var/www/magento/pub
-#      - var:/var/www/magento/var
-#      - generated:/var/www/magento/generated
-#      - etc:/var/www/magento/etc
+      - "9200:9200"
+  rabbitmq:
+    hostname: rabbitmq.magento2.docker
+    image: rabbitmq:3.8-management
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rabbitmq.tls=true
+      - traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.${WEBSITE_DOMAIN}`)
+      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+    volumes:
+      - ~/rabbitmq:/var/lib/rabbitmq
+  redis:
+    hostname: redis.magento2.docker
+    image: 'sashas777/magento-redis:5.0'
+    volumes:
+      - ~/redis:/data
+
 networks:
-  magento:
-   external:
-    name: magento
+  default:
+    name: local

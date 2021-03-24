@@ -1,0 +1,52 @@
+version: "3.5"
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:2.4
+    ports:
+#      - "${TRAEFIK_LISTEN:-127.0.0.1}:80:80"     # The HTTP port
+      - "${TRAEFIK_LISTEN:-127.0.0.1}:443:443"   # The HTTPS port
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
+      - ./ssl/certs:/etc/ssl/certs
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.local.test`)
+      - traefik.http.routers.traefik.service=api@internal
+    restart: always
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/portainer:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.tls=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.local.test`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+    restart: always
+  mailhog:
+    container_name: mailhog
+    hostname: mailhog.magento2.docker
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - "1025:1025"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailhog.tls=true
+      - traefik.http.routers.mailhog.rule=Host(`mailhog.local.test`)
+      - traefik.http.services.mailhog.loadbalancer.server.port=8025
+
+volumes:
+  portainer:
+  sshd_keys:
+
+networks:
+  default:
+    name: local
