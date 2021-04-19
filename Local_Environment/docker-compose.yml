@@ -5,6 +5,11 @@ services:
     image: 'mariadb:10.4'
     ports:
       - '3306:3306'
+    command: >
+      bash -c "
+      chmod 644 /etc/mysql/conf.d/*.cnf
+      && docker-entrypoint.sh mysqld
+      "
     volumes:
       - ./dev/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - ~/mysql:/var/lib/mysql
@@ -44,6 +49,7 @@ services:
     image: 'sashas777/magento-php:7.4-cli'
     hostname: cli.magento2.docker
     restart: unless-stopped
+    command: run-cron
     depends_on:
       - db
       - elasticsearch
@@ -64,18 +70,22 @@ services:
   rabbitmq:
     hostname: rabbitmq.magento2.docker
     image: rabbitmq:3.8-management
+    ports:
+      - "5672"
     labels:
       - traefik.enable=true
       - traefik.http.routers.rabbitmq.tls=true
       - traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.${WEBSITE_DOMAIN}`)
       - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
     volumes:
-      - ~/rabbitmq:/var/lib/rabbitmq
+      - ./dev/rabbitmq:/var/lib/rabbitmq
   redis:
     hostname: redis.magento2.docker
     image: 'sashas777/magento-redis:5.0'
+    ports:
+      - 6379
     volumes:
-      - ~/redis:/data
+      - ./dev/redis:/data
 
 networks:
   default:
