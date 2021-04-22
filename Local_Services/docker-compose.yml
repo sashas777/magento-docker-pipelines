@@ -4,8 +4,8 @@ services:
     container_name: traefik
     image: traefik:2.4
     ports:
-#      - "${TRAEFIK_LISTEN:-127.0.0.1}:80:80"     # The HTTP port
-      - "${TRAEFIK_LISTEN:-127.0.0.1}:443:443"   # The HTTPS port
+      - "80:80"     # The HTTP port
+      - "443:443"   # The HTTPS port
     volumes:
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml
       - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
@@ -23,7 +23,7 @@ services:
     image: portainer/portainer-ce
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/portainer:/data
+      - ~/sportainer:/data
     labels:
       - traefik.enable=true
       - traefik.http.routers.portainer.tls=true
@@ -42,7 +42,26 @@ services:
       - traefik.http.routers.mailhog.tls=true
       - traefik.http.routers.mailhog.rule=Host(`mailhog.local.test`)
       - traefik.http.services.mailhog.loadbalancer.server.port=8025
-
+  db:
+    container_name: db
+    image: 'mariadb:10.4'
+    ports:
+      - '3306:3306'
+    command: >
+      bash -c "
+      chmod 644 /etc/mysql/conf.d/*.cnf
+      && docker-entrypoint.sh mysqld
+      "
+    volumes:
+      - ~/mysql:/var/lib/mysql
+      - ./mysql/custom-config.cnf:/etc/mysql/conf.d/custom-config.cnf
+    restart: unless-stopped
+    hostname: db.magento2.docker
+    environment:
+      - MYSQL_ROOT_PASSWORD=magento2
+      - MYSQL_DATABASE=mag22
+      - MYSQL_USER=magento2
+      - MYSQL_PASSWORD=magento2
 volumes:
   portainer:
   sshd_keys:
