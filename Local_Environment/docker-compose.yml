@@ -1,30 +1,12 @@
 version: '3.8'
 
 services:
-  db:
-    image: 'mariadb:10.4'
-    ports:
-      - '3306:3306'
-    command: >
-      bash -c "
-      chmod 644 /etc/mysql/conf.d/*.cnf
-      && docker-entrypoint.sh mysqld
-      "
-    volumes:
-      - ./dev/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ~/mysql:/var/lib/mysql
-      - ./dev/mysql/custom-config.cnf:/etc/mysql/conf.d/custom-config.cnf
-    restart: unless-stopped
-    hostname: db.magento2.docker
-    env_file:
-      - ./global.env
   fpm:
     image: 'sashas777/magento-php:7.4-fpm'
+    container_name: ${PROJECT_NAME}-fpm
     hostname: fpm.magento2.docker
     ports:
       - 9000
-    depends_on:
-      - db
     env_file:
       - ./global.env
     restart: unless-stopped
@@ -32,9 +14,9 @@ services:
       - ./src:/var/www/magento:rw
   web:
     image: 'sashas777/magento-nginx:latest'
+    container_name: ${PROJECT_NAME}-web
     depends_on:
       - fpm
-      - db
     env_file:
       - ./global.env
     restart: unless-stopped
@@ -42,48 +24,49 @@ services:
       - ./src:/var/www/magento:rw
     labels:
       - traefik.enable=true
-      - traefik.http.routers.web.tls=true
-      - traefik.http.routers.web.rule=Host(`${WEBSITE_DOMAIN}`)
-      - traefik.http.services.web.loadbalancer.server.port=8080
+      - traefik.http.routers.${PROJECT_NAME}-web.tls=true
+      - traefik.http.routers.${PROJECT_NAME}-web.priority=2
+      - traefik.http.routers.${PROJECT_NAME}-web.rule=Host(`${WEBSITE_DOMAIN}`)
+      - traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=8080
   cli:
     image: 'sashas777/magento-php:7.4-cli'
+    container_name: ${PROJECT_NAME}-cli
     hostname: cli.magento2.docker
     restart: unless-stopped
     command: run-cron
     depends_on:
-      - db
       - elasticsearch
     volumes:
       - ~/.cache/composer:/root/.cache/composer:rw
       - ./src:/var/www/magento:rw
+      - ~/.ssh:/var/www/magento/.ssh
     env_file:
       - ./global.env
   elasticsearch:
     image: 'sashas777/magento-elasticsearch:7.9.3'
-    hostname: elasticsearch.magento2.docker
+    container_name: ${PROJECT_NAME}-elasticsearch
+    hostname: elasticsearch.${WEBSITE_DOMAIN}
     restart: unless-stopped
     environment:
       ES_NETWORK_HOST: 'localhost'
       ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
-    ports:
-      - "9200:9200"
   rabbitmq:
-    hostname: rabbitmq.magento2.docker
     image: rabbitmq:3.8-management
-    ports:
-      - "5672"
+    hostname: rabbitmq.${WEBSITE_DOMAIN}
+    container_name: ${PROJECT_NAME}-rabbitmq
+    restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.rabbitmq.tls=true
-      - traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.${WEBSITE_DOMAIN}`)
-      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+      - traefik.http.routers.${PROJECT_NAME}-rabbitmq.tls=true
+      - traefik.http.routers.${PROJECT_NAME}-rabbitmq.rule=Host(`rabbitmq.${WEBSITE_DOMAIN}`)
+      - traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port=15672
     volumes:
       - ./dev/rabbitmq:/var/lib/rabbitmq
   redis:
-    hostname: redis.magento2.docker
     image: 'sashas777/magento-redis:5.0'
-    ports:
-      - 6379
+    container_name: ${PROJECT_NAME}-redis
+    hostname: redis.${WEBSITE_DOMAIN}
+    restart: unless-stopped
     volumes:
       - ./dev/redis:/data
 
