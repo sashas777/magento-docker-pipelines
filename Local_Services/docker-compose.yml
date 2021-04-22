@@ -21,9 +21,10 @@ services:
   portainer:
     container_name: portainer
     image: portainer/portainer-ce
+    command: --admin-password '$$2y$$05$$bvgK33Xc82dhIzDP34MhPOlGTwCitUL96ET11eSt1Az6aDXCTzbfe'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/sportainer:/data
+      - ~/portainer:/data
     labels:
       - traefik.enable=true
       - traefik.http.routers.portainer.tls=true
