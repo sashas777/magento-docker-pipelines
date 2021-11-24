@@ -1,5 +1,4 @@
 .idea/
 .sql
-global.env
 dev/docker-entrypoint-initdb.d/
 src
