@@ -2,7 +2,7 @@ version: "3.5"
 services:
   traefik:
     container_name: traefik
-    image: traefik:2.4
+    image: traefik:latest
     ports:
       - "80:80"     # The HTTP port
       - "443:443"   # The HTTPS port
