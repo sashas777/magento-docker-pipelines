@@ -8,8 +8,6 @@ The repository provides the most popular docker and pipeline configurations for 
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/sashas777/magento-docker">
 </p>
 
----
-
 ## Get started
 
 - Install Docker (for a local environment)
