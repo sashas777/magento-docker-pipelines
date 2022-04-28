@@ -1,4 +1,4 @@
-image: "sashas777/magento-php:7.3-cli"
+image: "sashas777/magento-php:7.4-cli"
 
 stages:
     - build
@@ -17,6 +17,7 @@ install:
             - composer.lock
     script:
         - composer config --global http-basic.repo.magento.com $COMPOSER_USER $COMPOSER_PASSWORD
+        - composer require --dev thesgroup/magento2-testing-framework --no-update
         - composer install --no-scripts --no-suggest --no-ansi --no-interaction --no-progress
 
 phpcs:
@@ -26,16 +27,8 @@ phpcs:
         paths:
             - vendor/
     script:
-        - vendor/bin/phpcs-tests
-
-phpstan:
-    stage: test
-    cache:
-        key: $CI_COMMIT_SHA
-        paths:
-            - vendor/
-    script:
-        - vendor/bin/phpstan-tests
+        - vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard,vendor/phpcompatibility/php-compatibility/PHPCompatibility
+        - vendor/bin/phpunit -c vendor/thesgroup/magento2-testing-framework/static/integrity/phpunit.xml
 
 eslint:
     stage: test
@@ -46,24 +39,6 @@ eslint:
     script:
         - vendor/bin/js-tests
 
-phpmd:
-    stage: test
-    cache:
-        key: $CI_COMMIT_SHA
-        paths:
-            - vendor/
-    script:
-        - vendor/bin/phpmd-tests
-
-integrity:
-    stage: test
-    cache:
-        key: $CI_COMMIT_SHA
-        paths:
-            - vendor/
-    script:
-        - vendor/bin/integrity-tests
-
 phpunit:
     stage: test
     cache:
@@ -72,7 +47,7 @@ phpunit:
             - vendor/
     artifacts:
         reports:
-            junit: clover.xml            
+            junit: clover.xml
     script:
         - docker-php-ext-enable xdebug
-        - vendor/bin/phpunit-tests
+        - vendor/bin/phpunit-tests 95

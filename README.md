@@ -11,7 +11,7 @@ The repository provides the most popular docker and pipeline configurations for 
 ## Get started
 
 - Install Docker (for a local environment)
-- Copy one of configurations, adjust it.
+- Copy a configuration file, adjust it.
 - Test and deploy it.
 
 ## Documentation
@@ -22,11 +22,11 @@ The repository provides the most popular docker and pipeline configurations for 
 - Windows
 - MacOS (Beta)
 
-### Pipeline Examples
+### Suppoerted Pipeline Examples
 
 - BitBucket
 - GitLab
-- Travis CI
+- Travis CI (Beta)
  
 ## Related Resources
 
