@@ -2,10 +2,10 @@
 The repository provides the most popular docker and pipeline configurations for a Magento 2 project.
 
 <p align="center">
-<img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/sashas777/magento-php">
-<a href="https://www.codetriage.com/sashas777/magento-docker-pipelines"><img src="https://www.codetriage.com/sashas777/magento-docker-pipelines/badges/users.svg" alt="Open Source Helpers" /></a>
-<img alt="GitHub" src="https://img.shields.io/github/license/sashas777/magento-docker-pipelines">
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/sashas777/magento-docker">
+<a href="https://hub.docker.com/r/sashas777/"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/sashas777/magento-php"></a>
+<a href="https://www.codetriage.com/sashas777/magento-docker-pipelines/"><img src="https://www.codetriage.com/sashas777/magento-docker-pipelines/badges/users.svg" alt="Open Source Helpers" /></a>
+<a href="https://github.com/sashas777/magento-docker-pipelines/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/sashas777/magento-docker-pipelines"></a>
+<a href="https://github.com/sashas777/magento-docker/"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/sashas777/magento-docker"></a>
 </p>
 
 ## Get Started
