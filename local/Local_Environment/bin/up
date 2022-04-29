@@ -1,3 +1,0 @@
-#!/bin/bash
-docker network create magento || true
-docker-compose up -d --force-recreate

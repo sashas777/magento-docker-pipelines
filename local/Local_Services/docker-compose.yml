@@ -4,7 +4,6 @@ services:
     container_name: traefik
     image: traefik:latest
     ports:
-      - "80:80"     # The HTTP port
       - "443:443"   # The HTTPS port
     volumes:
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml
@@ -63,6 +62,19 @@ services:
       - MYSQL_DATABASE=mag22
       - MYSQL_USER=magento2
       - MYSQL_PASSWORD=magento2
+  adminer:
+    container_name: adminer
+    hostname: adminer.magento2.docker
+    image: mailhog/mailhog
+    restart: always
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.adminer.tls=true
+      - traefik.http.routers.adminer.rule=Host(`adminer.local.test`)
+      - traefik.http.services.adminer.loadbalancer.server.port=8080
+
 volumes:
   portainer:
   sshd_keys:

@@ -25,7 +25,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.${PROJECT_NAME}-web.tls=true
-      - traefik.http.routers.${PROJECT_NAME}-web.priority=2
       - traefik.http.routers.${PROJECT_NAME}-web.rule=Host(`${WEBSITE_DOMAIN}`)
       - traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=8080
   cli:

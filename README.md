@@ -8,25 +8,22 @@ The repository provides the most popular docker and pipeline configurations for 
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/sashas777/magento-docker">
 </p>
 
-## Get started
+## Get Started
 
-- Install Docker (for a local environment)
-- Copy a configuration file, adjust it.
-- Test and deploy it.
+### Local Environment
+**NOTE:** Before you start with the local environment it is important to start the [Local Services Docker Stack](https://github.com/sashas777/magento-docker-pipelines/wiki/Docker-Local-Services)
 
-## Documentation
+[Docker Local Environment For A New Project](https://github.com/sashas777/magento-docker-pipelines/wiki/Docker-Local-Environment-For-A-New-Project)
 
-### Local Environment Examples
+### Pipelines
+You can start with common information about pipelines: [Pipeline Configuration](https://github.com/sashas777/magento-docker-pipelines/wiki/Pipeline-Configuration).
+Then you look at the Wiki for a specific platform:
 
-- Linux (Ubuntu)
-- Windows
-- MacOS (Beta)
-
-### Suppoerted Pipeline Examples
-
-- BitBucket
-- GitLab
-- Travis CI (Beta)
+### Examples
+- [BitBucket](https://github.com/sashas777/magento-docker-pipelines/wiki/Bitbucket-Pipeline)
+- [GitLab CI/CD](https://github.com/sashas777/magento-docker-pipelines/wiki/GitLab-CI-CD-Pipeline)
+- GitHub Actions (TBD)
+- Travis CI (TBD)
  
 ## Related Resources
 
@@ -43,9 +40,9 @@ Any request can be submitted on the [Github Issue Tracker](https://github.com/sa
 
 ## Credits
 
-Thanks [the contributors](https://github.com/sashas777/magento-docker-pipelines/graphs/contributors)
+Thanks to [contributors](https://github.com/sashas777/magento-docker-pipelines/graphs/contributors)
 
 ## Related Resources
 
-- [Docker Images Used For The Project](https://github.com/sashas777/magento-docker)
-- [Magento 2 Testing Framework Used For Pipelines](https://github.com/sashas777/magento2-testing-framework)
+- [Docker Images For The Project](https://github.com/sashas777/magento-docker)
+- [Magento 2 Testing Framework For The Pipeline Configuration](https://github.com/sashas777/magento2-testing-framework)
