@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  fpm:
+    image: 'sashas777/magento-php:7.4-fpm'
+    container_name: ${PROJECT_NAME}-fpm
+    hostname: fpm.magento2.docker
+    ports:
+      - 9000
+    env_file:
+      - ./global.env
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/magento:rw
+  web:
+    image: 'sashas777/magento-nginx:latest'
+    container_name: ${PROJECT_NAME}-web
+    depends_on:
+      - fpm
+    env_file:
+      - ./global.env
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/magento:rw
+    labels:
+      - traefik.enable=false
+      - traefik.http.routers.${PROJECT_NAME}-web.tls=false
+      - traefik.http.routers.${PROJECT_NAME}-web.rule=Host(`${WEBSITE_DOMAIN}`)
+      - traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=8080
+  cli:
+    image: 'sashas777/magento-php:7.4-cli'
+    container_name: ${PROJECT_NAME}-cli
+    hostname: cli.magento2.docker
+    restart: unless-stopped
+    command: run-cron
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ~/.cache/composer:/root/.cache/composer:rw
+      - ./src:/var/www/magento:rw
+      - ~/.ssh:/var/www/magento/.ssh
+    env_file:
+      - ./global.env
+  elasticsearch:
+    image: 'sashas777/magento-elasticsearch:7.9.3'
+    container_name: ${PROJECT_NAME}-elasticsearch
+    hostname: elasticsearch.${WEBSITE_DOMAIN}
+    restart: unless-stopped
+    environment:
+      ES_NETWORK_HOST: 'localhost'
+      ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    hostname: rabbitmq.${WEBSITE_DOMAIN}
+    container_name: ${PROJECT_NAME}-rabbitmq
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${PROJECT_NAME}-rabbitmq.tls=true
+      - traefik.http.routers.${PROJECT_NAME}-rabbitmq.rule=Host(`rabbitmq.${WEBSITE_DOMAIN}`)
+      - traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port=15672
+    volumes:
+      - ./dev/rabbitmq:/var/lib/rabbitmq
+  redis:
+    image: 'sashas777/magento-redis:5.0'
+    container_name: ${PROJECT_NAME}-redis
+    hostname: redis.${WEBSITE_DOMAIN}
+    restart: unless-stopped
+    volumes:
+      - ./dev/redis:/data
+  varnish:
+    image: 'sashas777/magento-varnish:7.0'
+    container_name: ${PROJECT_NAME}-varnish
+    hostname: varnish.${WEBSITE_DOMAIN}
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${PROJECT_NAME}-varnish.tls=true
+      - traefik.http.routers.${PROJECT_NAME}-varnish.priority=1
+      - traefik.http.routers.${PROJECT_NAME}-varnish.rule=Host(`varnish.${WEBSITE_DOMAIN}`)
+      - traefik.http.services.${PROJECT_NAME}-varnish.loadbalancer.server.port=80
+
+networks:
+  default:
+    external:
+      name: local
