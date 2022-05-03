@@ -38,7 +38,6 @@ services:
     volumes:
       - ~/.cache/composer:/root/.cache/composer:rw
       - ./src:/var/www/magento:rw
-      - ~/.ssh:/var/www/magento/.ssh
     env_file:
       - ./global.env
   elasticsearch:
