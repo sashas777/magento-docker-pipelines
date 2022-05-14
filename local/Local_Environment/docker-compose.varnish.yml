@@ -19,6 +19,8 @@ services:
       - fpm
     env_file:
       - ./global.env
+    environment:
+      - FPM_HOST=${PROJECT_NAME}-fpm
     restart: unless-stopped
     volumes:
       - ./src:/var/www/magento:rw
