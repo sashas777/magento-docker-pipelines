@@ -65,7 +65,7 @@ services:
   adminer:
     container_name: adminer
     hostname: adminer.magento2.docker
-    image: mailhog/mailhog
+    image: adminer
     restart: always
     environment:
       ADMINER_DEFAULT_SERVER: db
