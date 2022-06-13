@@ -19,6 +19,8 @@ services:
       - fpm
     env_file:
       - ./global.env
+    environment:
+      - FPM_HOST=${PROJECT_NAME}-fpm
     restart: unless-stopped
     volumes:
       - ./src:/var/www/magento:rw
@@ -38,7 +40,6 @@ services:
     volumes:
       - ~/.cache/composer:/root/.cache/composer:rw
       - ./src:/var/www/magento:rw
-      - ~/.ssh:/var/www/magento/.ssh
     env_file:
       - ./global.env
   elasticsearch:
