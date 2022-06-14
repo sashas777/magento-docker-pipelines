@@ -1,8 +1,8 @@
-elasticsearch:
-  image: 'sashas777/magento-elasticsearch:%s'
-  container_name: ${PROJECT_NAME}-elasticsearch
-  hostname: elasticsearch.${WEBSITE_DOMAIN}
-  restart: unless-stopped
-  environment:
-    ES_NETWORK_HOST: 'localhost'
-    ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
+  elasticsearch:
+    image: 'sashas777/magento-elasticsearch:%s'
+    container_name: ${PROJECT_NAME}-elasticsearch
+    hostname: elasticsearch.${WEBSITE_DOMAIN}
+    restart: unless-stopped
+    environment:
+      ES_NETWORK_HOST: 'localhost'
+      ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'

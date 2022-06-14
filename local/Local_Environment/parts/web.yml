@@ -1,17 +1,17 @@
-web:
-  image: 'sashas777/magento-nginx:latest'
-  container_name: ${PROJECT_NAME}-web
-  depends_on:
-    - fpm
-  env_file:
-    - ./global.env
-  environment:
-    - FPM_HOST=${PROJECT_NAME}-fpm
-  restart: unless-stopped
-  volumes:
-    - ./src:/var/www/magento:rw
-  labels:
-    - traefik.enable=true
-    - traefik.http.routers.${PROJECT_NAME}-web.tls=true
-    - traefik.http.routers.${PROJECT_NAME}-web.rule=Host(`${WEBSITE_DOMAIN}`)
-    - traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=8080
+  web:
+    image: 'sashas777/magento-nginx:latest'
+    container_name: ${PROJECT_NAME}-web
+    depends_on:
+      - fpm
+    env_file:
+      - ./global.env
+    environment:
+      - FPM_HOST=${PROJECT_NAME}-fpm
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/magento:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${PROJECT_NAME}-web.tls=true
+      - traefik.http.routers.${PROJECT_NAME}-web.rule=Host(`${WEBSITE_DOMAIN}`)
+      - traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=8080

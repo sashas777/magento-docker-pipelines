@@ -1,7 +1,7 @@
-redis:
-  image: 'sashas777/magento-redis:%s'
-  container_name: ${PROJECT_NAME}-redis
-  hostname: redis.${WEBSITE_DOMAIN}
-  restart: unless-stopped
-  volumes:
-    - ./dev/redis:/data
+  redis:
+    image: 'sashas777/magento-redis:%s'
+    container_name: ${PROJECT_NAME}-redis
+    hostname: redis.${WEBSITE_DOMAIN}
+    restart: unless-stopped
+    volumes:
+      - ./dev/redis:/data

@@ -1,11 +1,11 @@
-fpm:
-  image: 'sashas777/magento-php:%s'
-  container_name: ${PROJECT_NAME}-fpm
-  hostname: fpm.magento2.docker
-  ports:
-    - 9000
-  env_file:
-    - ./global.env
-  restart: unless-stopped
-  volumes:
-    - ./src:/var/www/magento:rw
+  fpm:
+    image: 'sashas777/magento-php:%s'
+    container_name: ${PROJECT_NAME}-fpm
+    hostname: fpm.magento2.docker
+    ports:
+      - 9000
+    env_file:
+      - ./global.env
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/magento:rw
