@@ -1,5 +1,5 @@
 cli:
-  image: 'sashas777/magento-php:7.4-cli'
+  image: 'sashas777/magento-php:%s'
   container_name: ${PROJECT_NAME}-cli
   hostname: cli.magento2.docker
   restart: unless-stopped
