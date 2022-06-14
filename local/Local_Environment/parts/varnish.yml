@@ -9,4 +9,3 @@
       - traefik.http.routers.${PROJECT_NAME}-varnish.priority=1
       - traefik.http.routers.${PROJECT_NAME}-varnish.rule=Host(`varnish.${WEBSITE_DOMAIN}`)
       - traefik.http.services.${PROJECT_NAME}-varnish.loadbalancer.server.port=80
-
