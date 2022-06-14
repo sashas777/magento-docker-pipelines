@@ -1,0 +1,12 @@
+varnish:
+  image: 'sashas777/magento-varnish:7.0'
+  container_name: ${PROJECT_NAME}-varnish
+  hostname: varnish.${WEBSITE_DOMAIN}
+  restart: unless-stopped
+  labels:
+    - traefik.enable=true
+    - traefik.http.routers.${PROJECT_NAME}-varnish.tls=true
+    - traefik.http.routers.${PROJECT_NAME}-varnish.priority=1
+    - traefik.http.routers.${PROJECT_NAME}-varnish.rule=Host(`varnish.${WEBSITE_DOMAIN}`)
+    - traefik.http.services.${PROJECT_NAME}-varnish.loadbalancer.server.port=80
+
