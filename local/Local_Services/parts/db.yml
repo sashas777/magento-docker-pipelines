@@ -1,0 +1,20 @@
+  db:
+    container_name: db
+    image: 'mariadb:10.4'
+    ports:
+      - '3306:3306'
+    command: >
+      bash -c "
+      chmod 644 /etc/mysql/conf.d/*.cnf
+      && docker-entrypoint.sh mysqld
+      "
+    volumes:
+      - ~/mysql:/var/lib/mysql
+      - ./mysql/custom-config.cnf:/etc/mysql/conf.d/custom-config.cnf
+    restart: unless-stopped
+    hostname: db.magento2.docker
+    environment:
+      - MYSQL_ROOT_PASSWORD=magento2
+      - MYSQL_DATABASE=mag22
+      - MYSQL_USER=magento2
+      - MYSQL_PASSWORD=magento2
