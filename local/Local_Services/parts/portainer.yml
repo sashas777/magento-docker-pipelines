@@ -11,8 +11,3 @@
       - traefik.http.routers.portainer.rule=Host(`portainer.local.test`)
       - traefik.http.services.portainer.loadbalancer.server.port=9000
     restart: always
-
-volumes:
-  portainer:
-  sshd_keys:
-
