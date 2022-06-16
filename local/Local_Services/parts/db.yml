@@ -18,3 +18,4 @@
       - MYSQL_DATABASE=%s
       - MYSQL_USER=%s
       - MYSQL_PASSWORD=%s
+
