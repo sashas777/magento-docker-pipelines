@@ -14,7 +14,7 @@
     restart: unless-stopped
     hostname: db.magento2.docker
     environment:
-      - MYSQL_ROOT_PASSWORD=magento2
-      - MYSQL_DATABASE=mag22
-      - MYSQL_USER=magento2
-      - MYSQL_PASSWORD=magento2
+      - MYSQL_ROOT_PASSWORD=%s
+      - MYSQL_DATABASE=%s
+      - MYSQL_USER=%s
+      - MYSQL_PASSWORD=%s
