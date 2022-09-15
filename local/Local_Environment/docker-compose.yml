@@ -35,11 +35,14 @@ services:
     hostname: cli.magento2.docker
     restart: unless-stopped
     command: run-cron
+    cap_add:
+      - NET_ADMIN
     depends_on:
       - elasticsearch
     volumes:
       - ~/.cache/composer:/root/.cache/composer:rw
       - ./src:/var/www/magento:rw
+      - ssh-socket:/.ssh-agent
     env_file:
       - ./global.env
   elasticsearch:
@@ -69,6 +72,11 @@ services:
     restart: unless-stopped
     volumes:
       - ./dev/redis:/data
+
+volumes:
+  ssh-socket:
+    external:
+      name: ssh-socket
 
 networks:
   default:
