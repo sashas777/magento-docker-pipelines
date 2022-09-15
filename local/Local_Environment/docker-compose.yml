@@ -45,6 +45,8 @@ services:
       - ssh-socket:/.ssh-agent
     env_file:
       - ./global.env
+    environment:
+      - SSH_AUTH_SOCK=/.ssh-agent/proxy-socket
   elasticsearch:
     image: 'sashas777/magento-elasticsearch:7.9.3'
     container_name: ${PROJECT_NAME}-elasticsearch
