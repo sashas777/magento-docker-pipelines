@@ -3,35 +3,29 @@ version: '3.8'
 services:
   fpm:
     image: 'sashas777/magento-php:7.4-fpm'
-    container_name: ${PROJECT_NAME}-fpm
+    container_name: mag22-fpm
     hostname: fpm.magento2.docker
-    ports:
-      - 9000
-    env_file:
-      - ./global.env
     restart: unless-stopped
     volumes:
       - ./src:/var/www/magento:rw
   web:
     image: 'sashas777/magento-nginx:latest'
-    container_name: ${PROJECT_NAME}-web
+    container_name: mag22-web
     depends_on:
       - fpm
-    env_file:
-      - ./global.env
     environment:
-      - FPM_HOST=${PROJECT_NAME}-fpm
+      - FPM_HOST=mag22-fpm
     restart: unless-stopped
     volumes:
       - ./src:/var/www/magento:rw
     labels:
       - traefik.enable=true
-      - traefik.http.routers.${PROJECT_NAME}-web.tls=true
-      - traefik.http.routers.${PROJECT_NAME}-web.rule=Host(`${WEBSITE_DOMAIN}`)
-      - traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=8080
+      - traefik.http.routers.mag22-web.tls=true
+      - traefik.http.routers.mag22-web.rule=Host(`mag22.test`)
+      - traefik.http.services.mag22-web.loadbalancer.server.port=8080
   cli:
     image: 'sashas777/magento-php:7.4-cli'
-    container_name: ${PROJECT_NAME}-cli
+    container_name: mag22-cli
     hostname: cli.magento2.docker
     restart: unless-stopped
     command: run-cron
@@ -43,34 +37,32 @@ services:
       - ~/.cache/composer:/root/.cache/composer:rw
       - ./src:/var/www/magento:rw
       - ssh-socket:/.ssh-agent
-    env_file:
-      - ./global.env
     environment:
       - SSH_AUTH_SOCK=/.ssh-agent/proxy-socket
   elasticsearch:
     image: 'sashas777/magento-elasticsearch:7.9.3'
-    container_name: ${PROJECT_NAME}-elasticsearch
-    hostname: elasticsearch.${WEBSITE_DOMAIN}
+    container_name: mag22-elasticsearch
+    hostname: elasticsearch.mag22.test
     restart: unless-stopped
     environment:
       ES_NETWORK_HOST: 'localhost'
       ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
   rabbitmq:
     image: rabbitmq:3.8-management
-    hostname: rabbitmq.${WEBSITE_DOMAIN}
-    container_name: ${PROJECT_NAME}-rabbitmq
+    hostname: rabbitmq.mag22.test
+    container_name: mag22-rabbitmq
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.${PROJECT_NAME}-rabbitmq.tls=true
-      - traefik.http.routers.${PROJECT_NAME}-rabbitmq.rule=Host(`rabbitmq.${WEBSITE_DOMAIN}`)
-      - traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port=15672
+      - traefik.http.routers.mag22-rabbitmq.tls=true
+      - traefik.http.routers.mag22-rabbitmq.rule=Host(`rabbitmq.mag22.test`)
+      - traefik.http.services.mag22-rabbitmq.loadbalancer.server.port=15672
     volumes:
       - ./dev/rabbitmq:/var/lib/rabbitmq
   redis:
     image: 'sashas777/magento-redis:5.0'
-    container_name: ${PROJECT_NAME}-redis
-    hostname: redis.${WEBSITE_DOMAIN}
+    container_name: mag22-redis
+    hostname: redis.mag22.test
     restart: unless-stopped
     volumes:
       - ./dev/redis:/data
