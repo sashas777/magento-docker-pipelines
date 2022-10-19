@@ -1,7 +1,0 @@
-tls:
-  stores:
-    default:
-    defaultCertificate:
-      certFile: /etc/ssl/certs/local.test.crt.pem
-      keyFile: /etc/ssl/certs/local.test.key.pem
-  certificates:

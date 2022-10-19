@@ -4,17 +4,25 @@ services:
     container_name: traefik
     image: traefik:latest
     ports:
-      - "443:443"   # The HTTPS port
+      - "443:443"
     volumes:
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
-      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
-      - ./ssl/certs:/etc/ssl/certs
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.tls=true
       - traefik.http.routers.traefik.rule=Host(`traefik.local.test`)
       - traefik.http.routers.traefik.service=api@internal
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network=local"
+      - "--providers.docker.defaultRule=Host(`{{ .Name }}.local.test`)"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.https=true"
+      - "--entryPoints.https.address=:443"
+      - "--log.level=INFO"
+      - "--global.checkNewVersion=true"
+      - "--global.sendAnonymousUsage=false"
     restart: always
 
   portainer:
@@ -30,6 +38,7 @@ services:
       - traefik.http.routers.portainer.rule=Host(`portainer.local.test`)
       - traefik.http.services.portainer.loadbalancer.server.port=9000
     restart: always
+
   mailhog:
     container_name: mailhog
     hostname: mailhog.magento2.docker
@@ -42,6 +51,7 @@ services:
       - traefik.http.routers.mailhog.tls=true
       - traefik.http.routers.mailhog.rule=Host(`mailhog.local.test`)
       - traefik.http.services.mailhog.loadbalancer.server.port=8025
+
   db:
     container_name: db
     image: 'mariadb:10.4'
@@ -58,10 +68,11 @@ services:
     restart: unless-stopped
     hostname: db.magento2.docker
     environment:
-      - MYSQL_ROOT_PASSWORD=magento2
-      - MYSQL_DATABASE=mag22
-      - MYSQL_USER=magento2
-      - MYSQL_PASSWORD=magento2
+      - MYSQL_ROOT_PASSWORD=pass
+      - MYSQL_DATABASE=magento
+      - MYSQL_USER=magento
+      - MYSQL_PASSWORD=magento
+
   adminer:
     container_name: adminer
     hostname: adminer.magento2.docker
@@ -74,11 +85,13 @@ services:
       - traefik.http.routers.adminer.tls=true
       - traefik.http.routers.adminer.rule=Host(`adminer.local.test`)
       - traefik.http.services.adminer.loadbalancer.server.port=8080
+
   ssh-agent:
     image: 'docksal/ssh-agent'
     volumes:
       - ~/.ssh:/root/.ssh:ro
       - ssh-socket:/.ssh-agent
+    restart: always
 
 volumes:
   ssh-socket:
