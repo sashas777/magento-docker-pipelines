@@ -21,7 +21,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.mag22-web.tls=true
-      - traefik.http.routers.mag22-web.rule=Host(`mag22.test`)
+      - traefik.http.routers.mag22-web.rule=Host(`mag22.local.test`)
       - traefik.http.services.mag22-web.loadbalancer.server.port=8080
   cli:
     image: 'sashas777/magento-php:7.4-cli'
@@ -42,27 +42,27 @@ services:
   elasticsearch:
     image: 'sashas777/magento-elasticsearch:7.9.3'
     container_name: mag22-elasticsearch
-    hostname: elasticsearch.mag22.test
+    hostname: elasticsearch.mag22.local.test
     restart: unless-stopped
     environment:
       ES_NETWORK_HOST: 'localhost'
       ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
   rabbitmq:
     image: rabbitmq:3.8-management
-    hostname: rabbitmq.mag22.test
+    hostname: rabbitmq.mag22.local.test
     container_name: mag22-rabbitmq
     restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.mag22-rabbitmq.tls=true
-      - traefik.http.routers.mag22-rabbitmq.rule=Host(`rabbitmq.mag22.test`)
+      - traefik.http.routers.mag22-rabbitmq.rule=Host(`rabbitmq.mag22.local.test`)
       - traefik.http.services.mag22-rabbitmq.loadbalancer.server.port=15672
     volumes:
       - ./dev/rabbitmq:/var/lib/rabbitmq
   redis:
     image: 'sashas777/magento-redis:5.0'
     container_name: mag22-redis
-    hostname: redis.mag22.test
+    hostname: redis.mag22.local.test
     restart: unless-stopped
     volumes:
       - ./dev/redis:/data
