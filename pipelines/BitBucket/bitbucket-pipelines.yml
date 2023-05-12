@@ -19,6 +19,7 @@ pipelines:
                 - composer
               name: PHP Code Sniffer
               script:
+                - /docker-entrypoint.sh echo "entrypoint executed"
                 - vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard,vendor/phpcompatibility/php-compatibility/PHPCompatibility
                 - vendor/bin/phpunit  -c vendor/thesgroup/magento2-testing-framework/static/integrity/phpunit.xml
               artifacts:
@@ -48,6 +49,7 @@ pipelines:
             size: 2x
             name: Build | Install/Upgrade | DI
             script:
+              - /docker-entrypoint.sh echo "entrypoint executed"
               - rm -rf vendor; rm -rf test-coverage-html;  cd /var/www/magento/;
               - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS
               - composer create-project --repository-url=https://repo.magento.com/  magento/project-community-edition . --no-interaction --no-ansi --no-dev

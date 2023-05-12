@@ -22,6 +22,7 @@ pipelines:
             size: 2x
             name: Build | Install/Upgrade | DI
             script:
+              - /docker-entrypoint.sh echo "entrypoint executed"
               - rm -rf vendor; rm -rf test-coverage-html;  cd /var/www/magento/;
               - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS
               - composer create-project --repository-url=https://repo.magento.com/  magento/project-community-edition . --no-interaction --no-ansi --no-dev

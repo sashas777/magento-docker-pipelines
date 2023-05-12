@@ -19,6 +19,7 @@ pipelines:
                 - composer
               name: PHP Code Sniffer
               script:
+                - /docker-entrypoint.sh echo "entrypoint executed"
                 - vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard,vendor/phpcompatibility/php-compatibility/PHPCompatibility
                 - vendor/bin/phpunit  -c vendor/thesgroup/magento2-testing-framework/static/integrity/phpunit.xml
               artifacts:
