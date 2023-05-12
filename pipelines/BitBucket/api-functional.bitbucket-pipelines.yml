@@ -21,6 +21,7 @@ pipelines:
             name: Build | Install | API-Functional tests
             script:
               - rm -rf vendor; rm -rf test-coverage-html;  cd /var/www/magento/;
+              - /docker-entrypoint.sh echo "entrypoint executed"
               - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS
               - composer create-project --repository-url=https://repo.magento.com/  magento/project-community-edition . --no-interaction --no-ansi --no-dev
               - composer config --global repositories.bitbucket.test path $BITBUCKET_CLONE_DIR

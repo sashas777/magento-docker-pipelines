@@ -7,6 +7,7 @@ pipelines:
             - composer
           name: Build
           script:
+            - /docker-entrypoint.sh echo "entrypoint executed"
             - composer config --global http-basic.repo.magento.com $MAGENTO_USER $MAGENTO_PASS
             - composer require --dev thesgroup/magento2-testing-framework --no-update
             - composer install --no-suggest --no-ansi --no-interaction --no-scripts
